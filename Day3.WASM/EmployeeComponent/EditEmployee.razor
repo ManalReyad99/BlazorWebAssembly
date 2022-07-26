@@ -1,0 +1,64 @@
+﻿@page "/Employee/Edit/{id:int}"
+@inject IService<Employee> EmpService
+@inject IService<Department> DeptService
+
+<h3>EditEmployee</h3>
+@if(Emp!=null){
+       <EditForm Model="Emp"  OnValidSubmit="Save">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <ValidationSummary></ValidationSummary>
+            <div>
+                <lable>Name</lable>
+                <InputText @bind-Value="Emp.Name" class="form-control" ></InputText>
+                <ValidationMessage For="()=>Emp.Name" class="text-danger"></ValidationMessage>
+            </div>
+            <div>
+                <lable>Salary</lable>
+                <InputNumber @bind-Value="Emp.Salary" class="form-control"></InputNumber>
+                <ValidationMessage For="()=>Emp.Salary" class="text-danger"></ValidationMessage>
+            </div>
+            <div>
+                <lable>Image</lable>
+                <InputText @bind-Value="Emp.Image" class="form-control"></InputText>
+                <ValidationMessage For=@(()=>Emp.Image) class="text-danger"></ValidationMessage>
+            </div>
+            <div>
+                <lable>Dept</lable>
+                @*<InputNumber @bind-Value="Emp.Dept_Id"></InputNumber>*@
+                <InputSelect @bind-Value="Emp.Dept_Id" class="form-control">
+                    @foreach (var dept in DeptList)
+                    {
+                        <option value="@dept.Id">@dept.Name</option>
+                    }    
+                </InputSelect>
+            </div>
+            <input type="submit" value="Save"/>
+        </EditForm>
+        @Emp.Name
+        @Emp.Salary
+        @Emp.Image
+        @Emp.Dept_Id
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public Employee Emp { get; set; }
+    public List<Department> DeptList { get; set; }
+
+    [Inject]
+    public NavigationManager navManager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Emp = await EmpService.GetById(Id);
+        DeptList = await DeptService.GetAll();
+        await base.OnInitializedAsync();
+    }
+    public async void  Save()
+    {
+        await EmpService.Update(Id, Emp);
+        navManager.NavigateTo("/Employee");
+    }
+}

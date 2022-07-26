@@ -1,0 +1,30 @@
+﻿@page "/Employee"
+@inject IService<Employee> EmpService
+
+<h3>GetAllEmployee</h3>
+
+@if (EmpList != null)
+{
+    <table>
+        @foreach (var item in EmpList)
+       {
+           <tr>
+               <td>
+                   @item.Name
+               </td>
+               <td>
+                   @item.Salary
+               </td>
+           </tr>
+       }
+    </table>
+}
+@code {
+    public List<Employee> EmpList { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        //get employees from srevice
+        EmpList =await  EmpService.GetAll();
+        await base.OnInitializedAsync();
+    }
+}
